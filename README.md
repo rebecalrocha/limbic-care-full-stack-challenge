@@ -6,7 +6,8 @@
 
 - TypeScript
 - NodeJS
-- React
+- React for web apps
+- React Native for mobile apps
 - Apollo GraphQL
 - PostgreSQL
 - Jest
@@ -30,7 +31,7 @@ It should be production quality as you understand it, i.e. tests, Docker, README
 
 ### Frontend
 
-App should be able to allow the user to enter, complete and exit a chat dialogue, completing the predefined steps.
+App should be able to allow the user to enter, complete and exit a chat dialogue, completing the predefined steps. An example dialogue tree is available [here](./example-dialogue-tree.drawio.svg).
 
 🔎 **Things we're looking for:**
 
