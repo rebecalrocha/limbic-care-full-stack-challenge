@@ -48,6 +48,10 @@ App should be able to allow the user to enter, complete and exit a chat dialogue
 - Handling the possibility of exiting a dialogue early and/or resuming a dialogue where the user left off
 - How to set up a chat dialogue which can branch into different paths based on user input
 
+## 📲 Mobile Developer Role Notes
+
+Follow the frontend instructions, using React Native to build the app. Focus only on the mobile app development. You can use [httpbin](https://httpbin.org/) or any other service you choose to simulate the API calls. No backend development is required.
+
 ## Instructions
 
 1. **Submitting Code**
