@@ -20,11 +20,16 @@ const typeDefs = gql`
 
   type Mutation {
     startQuestionnaire(name: String!): StartQuestionnaireResponse
-    createUserResponse(
+    continueQuestionnaire(
+      sessionId: String!
+      restart: Boolean!
+    ): ContinueQuestionnaireResponse
+    answerQuestion(
       sessionId: String!
       question: Int!
       answer: String!
-    ): UserResponse
+    ): AnswerQuestionResponse
+    finalizeQuestionnaire(sessionId: String!): FinalizeQuestionnaireResponse
   }
 
   type UserResponse {
@@ -35,6 +40,21 @@ const typeDefs = gql`
   }
 
   type StartQuestionnaireResponse {
+    sessionId: String!
+    message: String!
+  }
+
+  type ContinueQuestionnaireResponse {
+    sessionId: String!
+    message: String!
+  }
+
+  type AnswerQuestionResponse {
+    sessionId: String!
+    message: String!
+  }
+
+  type FinalizeQuestionnaireResponse {
     sessionId: String!
     message: String!
   }
