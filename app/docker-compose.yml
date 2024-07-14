@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   app:
     container_name: limbic-chatbot_app
@@ -23,6 +23,6 @@ services:
     ports:
       - "5432:5432"
     volumes:
-    - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
 volumes:
   db-data:

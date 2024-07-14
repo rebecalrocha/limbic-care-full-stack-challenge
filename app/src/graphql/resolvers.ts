@@ -1,9 +1,9 @@
-import UserResponse from "../db/models/UserResponse";
+import UserResponse from "../../db/models/userResponse";
 import { v4 as uuid4 } from "uuid";
 
 export const resolvers = {
   Mutation: {
-    startQuestionnaire: async (_: any, { name }: { name: string }) => {
+    startQuestionnaire: async (_: unknown, { name }: { name: string }) => {
       try {
         const sessionId: string = uuid4();
         console.log("sessionId! updates ", sessionId);
@@ -27,7 +27,7 @@ export const resolvers = {
       }
     },
     continueQuestionnaire: async (
-      _: any,
+      _: unknown,
       { sessionId, restart }: { sessionId: string; restart: boolean },
     ) => {
       try {
@@ -48,7 +48,7 @@ export const resolvers = {
       }
     },
     answerQuestion: async (
-      _: any,
+      _: unknown,
       {
         sessionId,
         question,
@@ -74,7 +74,7 @@ export const resolvers = {
       }
     },
     finalizeQuestionnaire: async (
-      _: any,
+      _: unknown,
       { sessionId }: { sessionId: string },
     ) => {
       try {
