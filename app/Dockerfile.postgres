@@ -1,5 +1,0 @@
-FROM postgres:latest
-
-ENV POSTGRES_DB=limbic-chatbot
-ENV POSTGRES_USER=user
-ENV POSTGRES_PASSWORD=Password!123
