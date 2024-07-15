@@ -2,48 +2,45 @@ import { gql } from "apollo-server";
 
 export const typeDefs = gql`
   type Query {
-    getUserResponses(name: String!): [UserResponse]
+    getAllQuestions: [Question]
+    getUserResponses(userId: Int!): [UserResponse]
   }
 
   type Mutation {
-    startQuestionnaire(name: String!): StartQuestionnaireResponse
-    continueQuestionnaire(
-      sessionId: String!
-      restart: Boolean!
-    ): ContinueQuestionnaireResponse
-    answerQuestion(
-      sessionId: String!
-      question: Int!
-      answer: String!
-    ): AnswerQuestionResponse
-    finalizeQuestionnaire(sessionId: String!): FinalizeQuestionnaireResponse
+    startQuestionnaire(name: String!): QuestionnaireResponse
+    restartQuestionnaire(userId: Int!): QuestionnaireResponse
+    submitAnswer(
+      userId: Int!
+      questionId: Int!
+      responseValue: String!
+    ): QuestionnaireResponse
+  }
+
+  type Question {
+    id: Int!
+    text: String!
+    order: Int!
+    options: [Option]
   }
 
   type UserResponse {
-    id: ID!
-    sessionId: String!
-    question: Int!
-    answer: String!
+    questionId: Int!
+    responseValue: String!
+    createdAt: String!
   }
 
-  type StartQuestionnaireResponse {
-    sessionId: String!
-    message: String!
+  type QuestionnaireResponse {
+    userId: Int!
+    nextQuestionId: Int
+    nextQuestionLabel: String
+    nextQuestionOptions: [Option]
   }
 
-  type ContinueQuestionnaireResponse {
-    sessionId: String!
-    message: String!
-  }
-
-  type AnswerQuestionResponse {
-    sessionId: String!
-    message: String!
-  }
-
-  type FinalizeQuestionnaireResponse {
-    sessionId: String!
-    message: String!
+  type Option {
+    id: Int!
+    questionId: Int!
+    label: String!
+    value: Int
   }
 `;
 

@@ -1,93 +1,106 @@
-import UserResponse from "../../db/models/userResponse";
-import { v4 as uuid4 } from "uuid";
+import User from "../../db/models/user";
+import Response from "../../db/models/response";
+import Question from "../../db/models/question";
 
 export const resolvers = {
+  Query: {
+    getAllQuestions: async () => {
+      const questions = await Question.query()
+        .withGraphFetched("options")
+        .orderBy("order");
+      return questions;
+    },
+    getUserResponses: async (_: unknown, { userId }: { userId: number }) => {
+      const userResponses = await Response.query()
+        .select("questionId", "responseValue", "createdAt")
+        .where("userId", userId);
+
+      return userResponses;
+    },
+  },
   Mutation: {
     startQuestionnaire: async (_: unknown, { name }: { name: string }) => {
-      try {
-        const sessionId: string = uuid4();
-        console.log("sessionId! updates ", sessionId);
-        await UserResponse.query().insert({
-          question: 0,
-          answer: name,
-          sessionId,
-        });
+      const newUser = await User.query().insert({ name });
 
-        const welcomeMessage = `Nice to meet you, ${name}!`;
-        const instructionsMessage = `For us to get started I will need to ask you some questions on how you've been feeling lately.`;
-        const startMessage = `Shall we start?`;
+      const firstQuestion = await Question.query()
+        .withGraphFetched("options")
+        .orderBy("order")
+        .first();
 
-        return {
-          message: `${welcomeMessage}\n${instructionsMessage}\n${startMessage}`,
-          sessionId,
-        };
-      } catch (error) {
-        console.error("Error starting questionnaire:", error);
-        throw new Error("Failed to start questionnaire");
-      }
+      return {
+        userId: newUser.id,
+        nextQuestionId: firstQuestion?.id,
+        nextQuestionLabel: firstQuestion?.text,
+        nextQuestionOptions: firstQuestion?.options,
+      };
     },
-    continueQuestionnaire: async (
+    restartQuestionnaire: async (
       _: unknown,
-      { sessionId, restart }: { sessionId: string; restart: boolean },
+      { userId }: { userId: number },
     ) => {
-      try {
-        if (restart) {
-          await UserResponse.query().delete().where({ sessionId });
-        }
+      await Response.query().delete().where("userId", userId);
 
-        const restartMessage = `Hello, what's your name?`;
-        const continueMessage = `Answer how often this happened in the last two weeks`;
+      await User.query().deleteById(userId);
 
-        return {
-          message: restart ? restartMessage : continueMessage,
-          sessionId,
-        };
-      } catch (error) {
-        console.error("Error continuing questionnaire:", error);
-        throw new Error("Failed to continue questionnaire");
-      }
+      const firstQuestion = await Question.query()
+        .withGraphFetched("options")
+        .orderBy("order")
+        .first();
+
+      return {
+        userId,
+        nextQuestionId: firstQuestion?.id,
+        nextQuestionLabel: firstQuestion?.text,
+        nextQuestionOptions: firstQuestion?.options,
+      };
     },
-    answerQuestion: async (
+    submitAnswer: async (
       _: unknown,
       {
-        sessionId,
-        question,
-        answer,
-      }: { sessionId: string; question: number; answer: string },
+        userId,
+        questionId,
+        responseValue,
+      }: { userId: number; questionId: number; responseValue: string },
     ) => {
-      try {
-        await UserResponse.query().insert({
-          question,
-          answer,
-          sessionId,
-        });
-
-        const nextQuestionMessage = `Next question...`;
-
-        return {
-          message: nextQuestionMessage,
-          sessionId,
-        };
-      } catch (error) {
-        console.error("Error answering question:", error);
-        throw new Error("Failed to answer question");
+      const question = await Question.query().findById(questionId);
+      if (!question) {
+        throw new Error(`Question with ID ${questionId} was not found.`);
       }
-    },
-    finalizeQuestionnaire: async (
-      _: unknown,
-      { sessionId }: { sessionId: string },
-    ) => {
-      try {
-        const finalMessage = `Thanks for answering!`;
 
-        return {
-          message: finalMessage,
-          sessionId,
-        };
-      } catch (error) {
-        console.error("Error finalizing questionnaire:", error);
-        throw new Error("Failed to finalize questionnaire");
-      }
+      // TODO check if responseValue is a question option
+      await Response.query().insert({
+        userId,
+        questionId,
+        responseValue,
+      });
+
+      // TODO put in a service
+      const getNextQuestion = (currentQuestionId: number, response: string) => {
+        switch (currentQuestionId) {
+          case 1:
+            return response === "1" ? 3 : 2;
+          case 2:
+            return response === "0" ? 3 : 1;
+          case 3:
+          case 4:
+          case 5:
+            return currentQuestionId + 1;
+          default:
+            throw new Error(`Unexpected question ID: ${currentQuestionId}`);
+        }
+      };
+
+      const nextQuestionId = getNextQuestion(questionId, responseValue);
+      const nextQuestion = await Question.query()
+        .findById(nextQuestionId)
+        .withGraphFetched("options");
+
+      return {
+        userId,
+        nextQuestionId: nextQuestion?.id,
+        nextQuestionLabel: nextQuestion?.text,
+        nextQuestionOptions: nextQuestion?.options,
+      };
     },
   },
 };
