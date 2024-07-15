@@ -12,8 +12,12 @@ const schema = makeExecutableSchema({
 
 const server = new ApolloServer({
   schema,
+  formatError: (error) => {
+    console.error("GraphQL error:", error);
+    return error;
+  },
 });
 
 server.listen().then(({ url }) => {
-  console.log(`🤖 Server ready at ${url}`);
+  console.log(`\n🤖 Server ready at ${url}\n`);
 });
