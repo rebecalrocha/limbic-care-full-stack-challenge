@@ -3,20 +3,24 @@ import Questionnaire from "../../db/models/questionnaire";
 import Question from "../../db/models/question";
 import QuestionnaireResponse from "../../db/models/questionnaireResponse";
 import Response from "../../db/models/response";
-import { Transaction } from "objection";
 
 export const resolvers = {
   Query: {
-    getQuestionnaires: async (_: unknown) => {
-      const questionnaires = await Questionnaire.query().withGraphFetched(
-        "[questions.[options]]"
-      );
+    getQuestionnaire: async (_: unknown, { name }: { name: string }) => {
+      const questionnaire = await Questionnaire.query()
+        .where("name", name)
+        .withGraphFetched("[questions.[options]]")
+        .first();
 
-      return questionnaires;
+      if (!questionnaire) {
+        throw new Error(`Questionnaire with name ${name} not found`);
+      }
+
+      return questionnaire;
     },
     getUserResponses: async (
       _: unknown,
-      { userId, questionnaireId }: { userId: number; questionnaireId: number }
+      { userId, questionnaireId }: { userId: number; questionnaireId: number },
     ) => {
       const userResponses = await QuestionnaireResponse.query()
         .where("userId", userId)
@@ -30,14 +34,14 @@ export const resolvers = {
   Mutation: {
     startQuestionnaire: async (
       _: unknown,
-      { name, questionnaireId }: { name: string; questionnaireId: number }
+      { name, questionnaireId }: { name: string; questionnaireId: number },
     ) => {
       const questionnaire =
         await Questionnaire.query().findById(questionnaireId);
 
       if (!questionnaire) {
         throw new Error(
-          `Questionnaire with ID ${questionnaireId} does not exist.`
+          `Questionnaire with ID ${questionnaireId} does not exist.`,
         );
       }
 
@@ -63,14 +67,14 @@ export const resolvers = {
         questionnaireResponseId: number;
         questionId: number;
         value: number;
-      }
+      },
     ) => {
       const questionnaireResponse =
         await QuestionnaireResponse.query().findById(questionnaireResponseId);
 
       if (!questionnaireResponse) {
         throw new Error(
-          `Questionnaire Response with ID ${questionnaireResponseId} does not exist.`
+          `Questionnaire Response with ID ${questionnaireResponseId} does not exist.`,
         );
       }
 
@@ -80,7 +84,7 @@ export const resolvers = {
         question.questionnaireId !== questionnaireResponse.questionnaireId
       ) {
         throw new Error(
-          `Question with ID ${questionId} does not belong to questionnaire with ID ${questionnaireResponse.questionnaireId}.`
+          `Question with ID ${questionId} does not belong to questionnaire with ID ${questionnaireResponse.questionnaireId}.`,
         );
       }
 
@@ -98,7 +102,7 @@ export const resolvers = {
     },
     resetQuestionnaire: async (
       _: unknown,
-      { userId, questionnaireId }: { userId: number; questionnaireId: number }
+      { userId, questionnaireId }: { userId: number; questionnaireId: number },
     ) => {
       const questionnaireResponse = await QuestionnaireResponse.query()
         .where("userId", userId)
@@ -111,9 +115,26 @@ export const resolvers = {
           .where("questionnaireResponseId", questionnaireResponse.id);
 
         await QuestionnaireResponse.query().deleteById(
-          questionnaireResponse.id
+          questionnaireResponse.id,
         );
       }
+
+      return { userId };
+    },
+    updateUserInfo: async (
+      _: unknown,
+      { userId, userInfo }: { userId: number; userInfo: User },
+    ) => {
+      const userUpdateData = {
+        phoneNumber: userInfo.phoneNumber,
+        dateOfBirth: userInfo.dateOfBirth,
+        email: userInfo.email,
+        consentToPush: userInfo.consentToPush,
+        consentToEmail: userInfo.consentToEmail,
+        consentToCall: userInfo.consentToCall,
+      };
+
+      await User.query().findById(userId).update(userUpdateData);
 
       return { userId };
     },

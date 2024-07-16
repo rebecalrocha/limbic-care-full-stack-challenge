@@ -2,7 +2,7 @@ import { gql } from "apollo-server";
 
 export const typeDefs = gql`
   type Query {
-    getQuestionnaires: [Questionnaire]
+    getQuestionnaire(name: String!): Questionnaire
     getUserResponses(userId: Int!, questionnaireId: Int!): QuestionnaireResponse
   }
 
@@ -17,6 +17,7 @@ export const typeDefs = gql`
       value: Int!
     ): Response
     resetQuestionnaire(userId: Int!, questionnaireId: Int!): UserIdResponse
+    updateUserInfo(userId: Int!, userInfo: User!): UserIdResponse
   }
 
   type Questionnaire {
@@ -59,6 +60,15 @@ export const typeDefs = gql`
   type Response {
     questionId: Int!
     value: Int!
+  }
+
+  input User {
+    phoneNumber: String
+    dateOfBirth: String
+    email: String
+    consentToPush: Boolean
+    consentToEmail: Boolean
+    consentToCall: Boolean
   }
 `;
 
