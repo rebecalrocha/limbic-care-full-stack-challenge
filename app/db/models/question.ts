@@ -1,5 +1,6 @@
 import { Model } from "objection";
 import Option from "./option";
+import Questionnaire from "./questionnaire";
 
 class Question extends Model {
   static get tableName() {
@@ -16,12 +17,20 @@ class Question extends Model {
           to: "options.questionId",
         },
       },
+      questionnaire: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Questionnaire,
+        join: {
+          from: "questions.questionnaireId",
+          to: "questionnaires.id",
+        },
+      },
     };
   }
 
   id!: number;
-  text!: string;
-  order!: number;
+  questionnaireId!: number;
+  label!: string;
   options?: Option[];
 }
 

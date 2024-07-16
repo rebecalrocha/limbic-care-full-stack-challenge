@@ -2,45 +2,63 @@ import { gql } from "apollo-server";
 
 export const typeDefs = gql`
   type Query {
-    getAllQuestions: [Question]
-    getUserResponses(userId: Int!): [UserResponse]
+    getQuestionnaires: [Questionnaire]
+    getUserResponses(userId: Int!, questionnaireId: Int!): QuestionnaireResponse
   }
 
   type Mutation {
-    startQuestionnaire(name: String!): QuestionnaireResponse
-    restartQuestionnaire(userId: Int!): QuestionnaireResponse
+    startQuestionnaire(
+      name: String!
+      questionnaireId: Int!
+    ): StartQuestionnaireResponse
     submitAnswer(
-      userId: Int!
+      questionnaireResponseId: Int!
       questionId: Int!
-      responseValue: String!
-    ): QuestionnaireResponse
+      value: Int!
+    ): Response
+    resetQuestionnaire(userId: Int!, questionnaireId: Int!): UserIdResponse
+  }
+
+  type Questionnaire {
+    id: Int!
+    name: String!
+    introMessage: String
+    questions: [Question]
   }
 
   type Question {
     id: Int!
-    text: String!
-    order: Int!
+    label: String!
     options: [Option]
   }
 
-  type UserResponse {
-    questionId: Int!
-    responseValue: String!
-    createdAt: String!
+  type StartQuestionnaireResponse {
+    userId: Int!
+    questionnaireResponseId: Int!
   }
 
-  type QuestionnaireResponse {
+  type UserIdResponse {
     userId: Int!
-    nextQuestionId: Int
-    nextQuestionLabel: String
-    nextQuestionOptions: [Option]
   }
 
   type Option {
     id: Int!
-    questionId: Int!
     label: String!
     value: Int
+  }
+
+  type QuestionnaireResponse {
+    id: Int!
+    userId: Int!
+    questionnaireId: Int!
+    responses: [Response]
+    totalValue: Int!
+    createdAt: String!
+  }
+
+  type Response {
+    questionId: Int!
+    value: Int!
   }
 `;
 

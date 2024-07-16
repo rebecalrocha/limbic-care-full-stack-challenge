@@ -1,5 +1,5 @@
 import { Model } from "objection";
-import User from "./user";
+import QuestionnaireResponse from "./questionnaireResponse";
 import Question from "./question";
 
 class Response extends Model {
@@ -9,12 +9,12 @@ class Response extends Model {
 
   static get relationMappings() {
     return {
-      user: {
+      questionnaireResponse: {
         relation: Model.BelongsToOneRelation,
-        modelClass: User,
+        modelClass: QuestionnaireResponse,
         join: {
-          from: "responses.userId",
-          to: "users.id",
+          from: "responses.questionnaireResponseId",
+          to: "questionnaire_responses.id",
         },
       },
       question: {
@@ -29,10 +29,9 @@ class Response extends Model {
   }
 
   id!: number;
-  userId!: number;
+  questionnaireResponseId!: number;
   questionId!: number;
-  responseValue!: string;
-  createdAt!: string;
+  value!: number;
 }
 
 export default Response;

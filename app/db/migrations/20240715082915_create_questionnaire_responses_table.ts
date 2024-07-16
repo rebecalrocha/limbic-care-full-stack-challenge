@@ -1,7 +1,7 @@
 import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
-  return knex.schema.createTable("responses", function (table) {
+  return knex.schema.createTable("questionnaire_responses", function (table) {
     table.increments("id").primary();
     table
       .integer("userId")
@@ -10,16 +10,16 @@ export async function up(knex: Knex): Promise<void> {
       .inTable("users")
       .onDelete("CASCADE");
     table
-      .integer("questionId")
+      .integer("questionnaireId")
       .unsigned()
       .references("id")
-      .inTable("questions")
+      .inTable("questionnaires")
       .onDelete("CASCADE");
-    table.text("responseValue");
+    table.integer("totalValue").defaultTo(0);
     table.timestamp("createdAt").defaultTo(knex.fn.now());
   });
 }
 
 export async function down(knex: Knex): Promise<void> {
-  return knex.schema.dropTable("responses");
+  return knex.schema.dropTable("questionnaire_responses");
 }

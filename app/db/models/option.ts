@@ -22,7 +22,7 @@ class Option extends Model {
   id!: number;
   questionId!: number;
   label!: string;
-  value?: number;
+  value!: number;
 }
 
 export default Option;
