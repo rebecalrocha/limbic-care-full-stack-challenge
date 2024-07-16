@@ -1,15 +1,17 @@
-// dialogs.ts
 export const dialogs = (firstName: string) => [
   {
     name: "greetings",
-    greetings: `Nice to meet you, ${firstName}!`,
+    feedbackMessage: `Nice to meet you, ${firstName}!`,
+  },
+  {
+    name: "start",
     introMessage:
       "For us to get started I will need to ask you some questions on how you've been feeling lately.",
     question: "Shall we start?",
-    type: "multi_choice",
+    type: "single_choice",
     options: [
-      { label: "Yes", value: true },
-      { label: "No", value: false },
+      { label: "Yes", value: "yes" },
+      { label: "No", value: "no" },
     ],
   },
   {
@@ -19,8 +21,11 @@ export const dialogs = (firstName: string) => [
       { label: "I want to restart", value: "restart" },
       { label: "Let's continue", value: "continue" },
     ],
-    type: "multi_choice",
-    nextMessage: "Alright, so...",
+    type: "single_choice",
+  },
+  {
+    name: "continuation",
+    feedbackMessage: "Alright, so...",
   },
   {
     name: "safetyMessage",
@@ -31,7 +36,7 @@ export const dialogs = (firstName: string) => [
       { label: "Call Samaritans", value: "samaritans" },
       { label: "Continue", value: "continue" },
     ],
-    type: "multi_choice",
+    type: "single_choice",
   },
   {
     name: "thanks",
@@ -54,6 +59,9 @@ export const dialogs = (firstName: string) => [
       { label: "Email", value: "email" },
       { label: "Push", value: "push" },
     ],
-    nextMessage: `Thanks, ${firstName}, that's all for now!`,
+  },
+  {
+    name: "bye",
+    feedbackMessage: `Thanks, ${firstName}, that's all for now!`,
   },
 ];

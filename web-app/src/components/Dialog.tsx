@@ -3,6 +3,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SendIcon from "@mui/icons-material/Send";
+import { isValid, parseISO } from "date-fns";
 
 interface Props {
   onInput: (input: string | Date) => void;
@@ -10,7 +11,7 @@ interface Props {
 }
 
 const Dialog: React.FC<Props> = ({ onInput, type = "text" }) => {
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string | Date>("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,10 +19,21 @@ const Dialog: React.FC<Props> = ({ onInput, type = "text" }) => {
     setInput("");
   };
 
-  const handleDateChange = (date: Date | null) => {
-    if (date) {
-      onInput(date);
+  const handleDateChange = (date: Date | null | string) => {
+    if (typeof date === "string") {
+      const parsedDate = parseISO(date);
+      if (isValid(parsedDate)) {
+        setInput(parsedDate);
+      }
+    } else if (date instanceof Date && !isNaN(date.getTime())) {
+      setInput(date);
     }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const capitalizedInput =
+      event.target.value.charAt(0).toUpperCase() + event.target.value.slice(1);
+    setInput(capitalizedInput);
   };
 
   return (
@@ -31,17 +43,23 @@ const Dialog: React.FC<Props> = ({ onInput, type = "text" }) => {
         style={{ display: "flex", alignItems: "center" }}
       >
         {type === "date" ? (
-          <DatePicker onChange={(date) => handleDateChange(date)} />
+          <DatePicker
+            onChange={(date) => handleDateChange(date)}
+            slotProps={{ textField: { size: "small", fullWidth: true } }}
+            sx={{ marginRight: "8px" }}
+          />
         ) : (
           <TextField
             variant="outlined"
             value={input}
             size="small"
-            fullWidth
             type={type}
-            onChange={(e) => setInput(e.target.value)}
+            color="secondary"
+            onChange={handleInputChange}
             sx={{ marginRight: "10px" }}
+            placeholder={type === "number" ? "(99) 9999-9999" : ""}
             autoComplete="off"
+            fullWidth
           />
         )}
         <Button variant="outlined" color="secondary" type="submit" size="large">

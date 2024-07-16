@@ -2,11 +2,10 @@ import { dialogs } from "./dialogs";
 
 interface DialogItem {
   name: string;
-  greetings?: string;
   introMessage?: string;
-  question: string;
-  nextMessage?: string;
-  type: string;
+  question?: string;
+  feedbackMessage?: string;
+  type?: string;
   options?: { label: string; value: any }[];
 }
 
@@ -23,27 +22,39 @@ export default class ConversationFlow {
     return this.dialogs[this.currentStep];
   }
 
+  public moveToNext(): void {
+    this.currentStep++;
+  }
+
   public processUserInput(
-    input: string | boolean | number | Date,
+    input: string | number | Date | string[],
   ): DialogItem | undefined {
     const currentDialog = this.dialogs[this.currentStep];
 
-    if (currentDialog.type === "input") {
-      this.moveToNext();
-    } else if (currentDialog.type === "multi_choice" && currentDialog.options) {
-      const option = currentDialog.options.find((opt) => opt.value === input);
-      if (option) {
-        if (currentDialog.nextMessage && option.value !== "continue") {
-          currentDialog.question = currentDialog.nextMessage;
-        }
+    if (currentDialog.name === "greetings") {
+      if (input === "yes") {
+        this.moveToNext();
+      } else if (input === "no") {
+        this.currentStep++;
+      }
+    } else if (currentDialog.name === "noWorries") {
+      if (input === "restart") {
+        this.currentStep = this.dialogs.findIndex(
+          (dialog) => dialog.name === "continuation",
+        );
+        this.currentStep = this.dialogs.findIndex(
+          (dialog) => dialog.name === "greetings",
+        );
+      } else if (input === "continue") {
+        this.currentStep = this.dialogs.findIndex(
+          (dialog) => dialog.name === "continuation",
+        );
         this.moveToNext();
       }
+    } else {
+      this.moveToNext();
     }
 
     return this.getCurrentDialog();
-  }
-
-  private moveToNext(): void {
-    this.currentStep++;
   }
 }
