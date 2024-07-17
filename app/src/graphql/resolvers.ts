@@ -4,6 +4,16 @@ import Question from "../../db/models/question";
 import QuestionnaireResponse from "../../db/models/questionnaireResponse";
 import Response from "../../db/models/response";
 
+export interface UserInfo {
+  name: string;
+  phoneNumber?: string;
+  dateOfBirth?: Date;
+  email?: string;
+  consentToPush?: boolean;
+  consentToEmail?: boolean;
+  consentToCall?: boolean;
+}
+
 export const resolvers = {
   Query: {
     getQuestionnaire: async (_: unknown, { name }: { name: string }) => {
@@ -124,7 +134,7 @@ export const resolvers = {
     },
     updateUserInfo: async (
       _: unknown,
-      { userId, userInfo }: { userId: number; userInfo: User },
+      { userId, userInfo }: { userId: number; userInfo: UserInfo },
     ) => {
       const userUpdateData = {
         phoneNumber: userInfo.phoneNumber,
