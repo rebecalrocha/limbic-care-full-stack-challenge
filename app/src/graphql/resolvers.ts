@@ -128,6 +128,8 @@ export const resolvers = {
         await QuestionnaireResponse.query().deleteById(
           questionnaireResponse.id,
         );
+
+        await User.query().deleteById(userId);
       }
 
       return { userId };

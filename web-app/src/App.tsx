@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
+import { Container } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import EmotionalWellbeingDialog from "./services/EmotionalWellbeingDialog";
-import { Container } from "@mui/material";
 import MessageDisplay from "./components/MessageDisplay";
 import DialogManager from "./components/DialogManager";
 
@@ -15,9 +15,7 @@ const App: React.FC = () => {
   const [conversationFlow, setConversationFlow] = useState<
     EmotionalWellbeingDialog | undefined
   >();
-  const [messages, setMessages] = useState<Message[]>([
-    { text: "Hello, what's your name?", sender: "bot" },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>

@@ -1,5 +1,5 @@
 import Option from "../option";
-import Question from "../question"; // Importe o modelo de Question aqui
+import Question from "../question";
 import knex from "../../../src/config/knex";
 import Questionnaire from "../questionnaire";
 

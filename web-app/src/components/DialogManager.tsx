@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box } from "@mui/material";
+import { Message } from "../App";
+import { DateValidator, LabelFormatter } from "../services/utils/dialogUtils";
 import EmotionalWellbeingDialog from "../services/EmotionalWellbeingDialog";
+import { helloDialog } from "../dialogs/helloDialog";
 import InputField from "../components/InputField";
 import SingleChoiceSelect from "../components/SingleChoiceSelect";
 import MultiChoiceSelect from "../components/MultiChoiceSelect";
-import { Message } from "../App";
 
 interface Props {
   conversationFlow?: EmotionalWellbeingDialog;
@@ -19,29 +21,17 @@ const DialogManager: React.FC<Props> = ({
   setConversationFlow,
   setMessages,
 }) => {
-  const addMessage = (text: string, sender: "bot" | "user") => {
-    setMessages((prev) => [...prev, { text, sender }]);
+  const addMessages = (messages: Message[]) => {
+    setMessages((prevMessages) => [...prevMessages, ...messages]);
   };
 
-  const handleNameInput = async (input: string | Date) => {
-    const userInput = input.toString();
+  const handleIntroInput = async (input: string | Date) => {
+    const userInput = String(input);
     const newSurvey = new EmotionalWellbeingDialog(userInput);
     setConversationFlow(newSurvey);
-    addMessage(userInput, "user");
 
-    const nextDialog = await newSurvey.processUserInput(input);
-
-    const newMessages: Message[] = [];
-
-    if (nextDialog?.introMessage) {
-      newMessages.push({ text: nextDialog.introMessage, sender: "bot" });
-    }
-
-    if (nextDialog?.question) {
-      newMessages.push({ text: nextDialog.question, sender: "bot" });
-    }
-
-    setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+    const newMessages: Message[] = [{ text: userInput, sender: "user" }];
+    await processNextDialog(newSurvey, input, newMessages);
   };
 
   const handleDialogInput = async (input: string | Date | string[]) => {
@@ -49,15 +39,31 @@ const DialogManager: React.FC<Props> = ({
 
     const inputLabel = Array.isArray(input)
       ? input
-          .map((partialInput) => conversationFlow.getOptionLabel(partialInput))
+          .map((partialInput) =>
+            LabelFormatter.getOptionLabel(
+              conversationFlow.getCurrentDialog(),
+              partialInput,
+            ),
+          )
           .join(", ")
-      : conversationFlow.getOptionLabel(input);
+      : LabelFormatter.getOptionLabel(
+          conversationFlow.getCurrentDialog(),
+          input,
+        );
 
-    addMessage(inputLabel, "user");
+    const newMessages: Message[] = [{ text: inputLabel, sender: "user" }];
+    await processNextDialog(conversationFlow, input, newMessages);
+  };
 
-    const nextDialog = await conversationFlow.processUserInput(input);
-
-    const newMessages: Message[] = [];
+  const processNextDialog = async (
+    dialogFlow: EmotionalWellbeingDialog,
+    input: string | Date | string[],
+    newMessages: Message[],
+  ) => {
+    const inputValue =
+      input instanceof Date ? DateValidator.formatDate(input) : input;
+    console.log("inputValue:  ", inputValue);
+    const nextDialog = await dialogFlow.processUserInput(inputValue);
 
     if (nextDialog?.introMessage) {
       newMessages.push({ text: nextDialog.introMessage, sender: "bot" });
@@ -65,14 +71,12 @@ const DialogManager: React.FC<Props> = ({
 
     if (nextDialog?.feedbackMessage) {
       newMessages.push({ text: nextDialog.feedbackMessage, sender: "bot" });
-
-      if (
-        !nextDialog.question &&
-        !["goodbye", "callingSamaritans", "calling999"].includes(
-          nextDialog.name,
-        )
-      ) {
-        conversationFlow.moveToNext();
+      const nextQuestion = dialogFlow.getNextDialog();
+      if (nextQuestion?.introMessage) {
+        newMessages.push({ text: nextQuestion.introMessage, sender: "bot" });
+      }
+      if (nextQuestion?.question) {
+        newMessages.push({ text: nextQuestion.question, sender: "bot" });
       }
     }
 
@@ -80,12 +84,12 @@ const DialogManager: React.FC<Props> = ({
       newMessages.push({ text: nextDialog.question, sender: "bot" });
     }
 
-    setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+    addMessages(newMessages);
   };
 
   const renderCurrentDialogOptions = () => {
     if (!conversationFlow) {
-      return <InputField onInput={handleNameInput} />;
+      return <InputField onInput={handleIntroInput} />;
     }
 
     const currentDialog = conversationFlow.getCurrentDialog();
@@ -104,7 +108,6 @@ const DialogManager: React.FC<Props> = ({
             onInput={handleDialogInput}
           />
         );
-      default:
       case "single_choice":
         return (
           <SingleChoiceSelect
@@ -112,8 +115,15 @@ const DialogManager: React.FC<Props> = ({
             onInput={handleDialogInput}
           />
         );
+      default:
+        return null;
     }
   };
+
+  useEffect(() => {
+    setMessages([{ text: helloDialog.question!, sender: "bot" }]);
+    // eslint-disable-next-line
+  }, []);
 
   return <Box>{renderCurrentDialogOptions()}</Box>;
 };

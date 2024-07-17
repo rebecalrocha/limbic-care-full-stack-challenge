@@ -6,9 +6,13 @@ import {
   updateUserInfo,
 } from "../graphql/requests";
 import client from "../graphql/client";
-import FlowManagerDialog, { DialogItem, InputType } from "./FlowManagerDialog";
-import { standardDialogs } from "../dialogs/standardDialogs";
+import { introductionDialogs } from "../dialogs/introductionDialog";
+import { personalInfoDialog } from "../dialogs/personalInfoDialog";
 import { DialogOption } from "../types/dialogTypes";
+import FlowManagerDialog, { DialogItem, InputType } from "./FlowManagerDialog";
+import { crisisDialog } from "../dialogs/crisisDialog";
+
+const QuestionnaireName = "EmotionalWellbeingDialog";
 
 export interface EmotionalWellbeingDialogItem {
   id: number;
@@ -18,56 +22,15 @@ export interface EmotionalWellbeingDialogItem {
   fromApi?: boolean;
 }
 export default class EmotionalWellbeingDialog extends FlowManagerDialog {
-  private userId: number | null = null;
-  private questionnaireId: number | null = null;
+  private userId?: number;
+  private questionnaireId?: number;
+  private questionnaireResponseId?: number;
+  private firstName: string;
 
   constructor(firstName: string) {
-    const dialogs = standardDialogs(firstName);
+    const dialogs = introductionDialogs(firstName);
     super(dialogs);
-  }
-
-  public async startQuestionnaire(firstName: string): Promise<void> {
-    const userInput = firstName;
-    const userId = await startQuestionnaire(
-      client,
-      userInput,
-      "EmotionalWellbeingDialog",
-    );
-    this.userId = userId;
-
-    const result = await fetchQuestionnaire(client, "EmotionalWellbeingDialog");
-
-    if (result) {
-      this.questionnaireId = result.id;
-
-      const questions = this.resolveSpecificQuestions(result);
-
-      const newDialogs = [
-        ...this.dialogs.slice(0, 6),
-        ...questions,
-        ...this.dialogs.slice(6),
-      ];
-
-      this.dialogs = newDialogs;
-
-      this.currentStep = this.dialogs.findIndex(
-        (dialog) => dialog?.name === "interestOrPleasure",
-      );
-    }
-  }
-
-  public async restartQuestionnaire(): Promise<void> {
-    console.log("restartQuestionnaire: ", this.userId, this.questionnaireId);
-    const userId = await restartQuestionnaire(
-      client,
-      this.userId!,
-      this.questionnaireId!,
-    );
-    this.userId = userId;
-
-    this.currentStep = this.dialogs.findIndex(
-      (dialog) => dialog?.name === "greetings",
-    );
+    this.firstName = firstName;
   }
 
   public async processUserInput(
@@ -78,15 +41,17 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
     if (currentDialog.fromApi) {
       await submitAnswer(
         client,
-        this.questionnaireId!,
-        Number(currentDialog.id),
+        this.questionnaireResponseId!,
+        currentDialog.id!,
         Number(input),
       );
     }
 
     switch (currentDialog.name) {
-      case "start":
+      case "greetings":
         return this.handleStartDialog(input);
+      case "start":
+        return this.handleGetQuestions(input);
       case "noWorries":
         return this.handleNoWorriesDialog(input);
       case "restart":
@@ -102,20 +67,48 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
       case "contactMethod":
         return this.handleContactInfoDialog(input);
       case "goodbye":
-      case "callingSamaritans":
-      case "calling999":
+      case "calling":
         return;
+      case "greetings":
+      case "continuation":
+      case "thanks":
+        return this.getCurrentDialog();
       default:
         this.moveToNext();
         return this.getCurrentDialog();
     }
   }
 
-  private async handleStartDialog(
+  private async handleStartDialog(input: InputType): Promise<DialogItem> {
+    const name = String(input);
+    const result = await startQuestionnaire(client, name, QuestionnaireName);
+    console.log("result:  ", result);
+    this.userId = result.userId;
+    this.questionnaireResponseId = result.questionnaireResponseId;
+    return this.getCurrentDialog();
+  }
+
+  private async handleGetQuestions(
     input: InputType,
   ): Promise<DialogItem | undefined> {
-    await this.startQuestionnaire(String(input));
-    if (input === "no") {
+    const result = await fetchQuestionnaire(client, QuestionnaireName);
+    this.questionnaireId = result.id;
+
+    if (input === "yes") {
+      this.questionnaireId = result.id;
+      const specificQuestions = this.sanitizeSpecificQuestions(result);
+
+      this.dialogs = [
+        ...this.dialogs,
+        ...specificQuestions,
+        ...crisisDialog,
+        ...personalInfoDialog(this.firstName),
+      ];
+
+      this.currentStep = this.dialogs.findIndex(
+        (dialog) => dialog?.name === "interestOrPleasure",
+      );
+    } else {
       this.currentStep = this.dialogs.findIndex(
         (dialog) => dialog?.name === "noWorries",
       );
@@ -127,7 +120,7 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
     input: InputType,
   ): Promise<DialogItem | undefined> {
     if (input === "restart") {
-      await this.restartQuestionnaire();
+      await restartQuestionnaire(client, this.userId!, this.questionnaireId!);
       this.currentStep = this.dialogs.findIndex(
         (dialog) => dialog?.name === "restart",
       );
@@ -142,14 +135,17 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
   private async handleRestartDialog(
     input: InputType,
   ): Promise<DialogItem | undefined> {
-    const userId = await startQuestionnaire(
+    const firstName = String(input);
+    const result = await startQuestionnaire(
       client,
-      String(input),
-      "EmotionalWellbeingDialog",
+      firstName,
+      QuestionnaireName,
     );
 
-    this.userId = Number(userId);
-    this.dialogs = standardDialogs(String(input));
+    this.userId = result.userId;
+    this.questionnaireResponseId = result.questionnaireResponseId;
+    this.firstName = firstName;
+    this.dialogs = introductionDialogs(firstName);
 
     this.currentStep = this.dialogs.findIndex(
       (dialog) => dialog?.name === "greetings",
@@ -164,7 +160,6 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
       this.currentStep = this.dialogs.findIndex(
         (dialog) => dialog?.name === "thanks",
       );
-      // this.moveToNext();
       return this.getCurrentDialog();
     } else if (Number(input) > 0) {
       this.currentStep = this.dialogs.findIndex(
@@ -178,9 +173,9 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
     input: InputType,
   ): Promise<DialogItem | undefined> {
     switch (input) {
-      case "999":
+      case "emergency":
         this.currentStep = this.dialogs.findIndex(
-          (dialog) => dialog?.name === "calling999",
+          (dialog) => dialog?.name === "callingEmergency",
         );
         break;
       case "samaritans":
@@ -228,7 +223,7 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
     return this.getCurrentDialog();
   }
 
-  private resolveSpecificQuestions(
+  private sanitizeSpecificQuestions(
     result: any,
   ): EmotionalWellbeingDialogItem[] {
     return result.questions.map(

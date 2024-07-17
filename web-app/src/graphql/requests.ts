@@ -28,7 +28,7 @@ export async function startQuestionnaire(
     });
 
     if (data && data.startQuestionnaire) {
-      return data.startQuestionnaire.userId;
+      return data.startQuestionnaire;
     }
   } catch (error) {
     console.error("Error starting questionnaire:", error);
@@ -57,7 +57,7 @@ export async function submitAnswer(
   client: ApolloClient<NormalizedCacheObject>,
   questionnaireResponseId: number,
   questionId: number,
-  value: number,
+  value: number | string,
 ) {
   try {
     const { data } = await client.mutate({

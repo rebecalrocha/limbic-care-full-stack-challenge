@@ -1,67 +1,60 @@
-# Limbic Fullstack Code Challenge
+# Limbic Chatbot Project
 
-## Project
+<img src="https://github.com/user-attachments/assets/58f7fe38-9c48-418c-b978-58e73603f1fd" alt="chatbot" width="500">
 
 ## Tech Stack
-
 - TypeScript
 - NodeJS
-- React for web apps
-- React Native for mobile apps
+- React
 - Apollo GraphQL
 - PostgreSQL
 - Jest
+- Knex
+- Objection
+- Material-UI
 
-You are writing an app and accompanying API where the end user can enter into a dialogue with the app in the style of a chatbot. The dialogue questions or steps are predefined. Your app should allow the user to enter into the chat dialogue and complete the steps as many times as they choose.
+### Installation
 
-### Backend
+1.Clone the repository:
+```
+git clone git@github.com:rebecalrocha/limbic-care-full-stack-challenge.git
+cd limbic-care-full-stack-challenge
+```
+2. Install dependencies:
+```
+yarn install
+```
 
-You will need GraphQL operations for, at least, storing the dialogue step answers from users. No user authentication is needed.
+3. Setup environment variables:
 
-🔎 **Things we're looking for:**
+Create a .env file based on .env.example with the following configuration:
 
-It should be production quality as you understand it, i.e. tests, Docker, README, documentation, etc.
+```
+NODE_ENV=development
+DB_HOST=db
+DB_USER=user
+DB_PASSWORD=Password!123
+DB_NAME=limbic-chatbot
+```
 
-- TypeScript
-- Project Structure
-- Unit or Integration Tests
-- API Design
-- Error Handling
-- Use of Knex query builder or a simple wrapper is preferred over something like Sequelize, which is unnecessary for this task
+4. Start Docker containers:
+```
+cd app
+docker-compose up --build
+```
+- This will start the backend application and PostgreSQL database. 
+- Migrations and seeding will be automatically handled by the Docker setup.
+- The backend server will be available at: http://localhost:4000
 
-### Frontend
+5. Start the frontend 
 
-App should be able to allow the user to enter, complete and exit a chat dialogue, completing the predefined steps. An example dialogue tree is available [here](./example-dialogue-tree.drawio.svg).
+```
+cd web-app
+yarn install
+yarn start
+```
 
-🔎 **Things we're looking for:**
+### GraphQL Playground
 
-- TypeScript
-- Project Structure
-- Components Structure
-- State Management
-- Separation of concerns
-- Data Handling
+Apollo GraphQL Playground at http://localhost:4000/graphql.
 
-🏆 **Bonus Possible Tasks:**
-
-- Accepting different types of user input (e.g. text, numbers, dates, etc.) instead of just text
-- Handling the possibility of exiting a dialogue early and/or resuming a dialogue where the user left off
-- How to set up a chat dialogue which can branch into different paths based on user input
-
-## 📲 Mobile Developer Role Notes
-
-Follow the frontend instructions, using React Native to build the app. Focus only on the mobile app development. You can use [httpbin](https://httpbin.org/) or any other service you choose to simulate the API calls. No backend development is required.
-
-## Instructions
-
-1. **Submitting Code**
-
-   Create a new repository on your GitHub account and push your code to it. Make sure to include a README file with instructions on how to run your code. If the repository is private, please ensure that you have invited us to view it. Alternatively, you can zip your project and send it to us via email.
-
-2. **Deadline:**
-
-   You have 1 week to complete as much tasks as you can from the challenge below. Countdown starts from the date you were invited to complete this challenge via email.
-
-3. **Implementation:**
-
-   There is no correct way to do the challenge, you are free to add whatever libraries you like besides the ones mentioned above. We want to see what you come up with on your own.
