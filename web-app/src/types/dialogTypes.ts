@@ -11,10 +11,12 @@ export interface DialogOption {
 }
 
 export interface DialogType {
+  id?: number;
   name: string;
   feedbackMessage?: string;
   introMessage?: string;
   question?: string;
   type?: DialogTypeType;
   options?: DialogOption[];
+  fromApi?: any;
 }

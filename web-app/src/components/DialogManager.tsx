@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import EmotionalWellbeingDialog from "../services/EmotionalWellbeingDialog";
 import InputField from "../components/InputField";
 import SingleChoiceSelect from "../components/SingleChoiceSelect";
 import MultiChoiceSelect from "../components/MultiChoiceSelect";
 import { Message } from "../App";
-import { format } from "date-fns";
 import { startQuestionnaire } from "../graphql/requests";
 import client from "../graphql/client";
 
@@ -31,50 +30,37 @@ const DialogManager: React.FC<Props> = ({
     const userId = await startQuestionnaire(
       client,
       userInput,
-      "EmotionalWellbeingSurvey",
+      "EmotionalWellbeingDialog",
     );
     const newSurvey = new EmotionalWellbeingDialog(userInput, userId);
     setConversationFlow(newSurvey);
     addMessage(userInput, "user");
+
+    const nextDialog = await newSurvey.processUserInput(input);
+    if (nextDialog?.question) {
+      console.log("aqui:  ", nextDialog.question);
+      addMessage(nextDialog.question, "bot");
+    }
   };
 
-  const handleDialogInput = (input: string | Date | string[]) => {
+  const handleDialogInput = async (input: string | Date | string[]) => {
     if (!conversationFlow) return;
 
     const inputLabel = Array.isArray(input)
-      ? input.map((partialInput) => getOptionLabel(partialInput)).join(", ")
-      : getOptionLabel(input);
+      ? input
+          .map((partialInput) => conversationFlow.getOptionLabel(partialInput))
+          .join(", ")
+      : conversationFlow.getOptionLabel(input);
 
     addMessage(inputLabel, "user");
 
-    const nextDialog = conversationFlow.processUserInput(input);
+    const nextDialog = await conversationFlow.processUserInput(input);
     if (nextDialog?.question) {
       addMessage(nextDialog.question, "bot");
     }
   };
 
-  const getOptionLabel = (input: string | Date): string => {
-    const currentDialog = conversationFlow!.getCurrentDialog();
-
-    if (currentDialog?.type === "single_choice" && currentDialog.options) {
-      const option = currentDialog.options.find((opt) => opt.value === input);
-      if (option) return option.label;
-    }
-
-    if (currentDialog?.type === "multi_choice" && currentDialog.options) {
-      const option = currentDialog.options.find((opt) => opt.value === input);
-      if (option) return option.label;
-    }
-
-    if (currentDialog?.type === "date") {
-      const date = typeof input === "string" ? new Date(input) : input;
-      return format(date, "dd MMMM yyyy");
-    }
-
-    return input.toString();
-  };
-
-  const renderCurrentDialog = () => {
+  const renderCurrentDialogOptions = () => {
     if (!conversationFlow) {
       return <InputField onInput={handleNameInput} />;
     }
@@ -88,26 +74,49 @@ const DialogManager: React.FC<Props> = ({
         return (
           <InputField onInput={handleDialogInput} type={currentDialog.type} />
         );
-      case "single_choice":
-        return (
-          <SingleChoiceSelect
-            options={currentDialog.options}
-            onInput={handleDialogInput}
-          />
-        );
       case "multi_choice":
         return (
           <MultiChoiceSelect
-            options={currentDialog.options}
+            options={currentDialog?.options}
             onInput={handleDialogInput}
           />
         );
       default:
-        return null;
+      case "single_choice":
+        return (
+          <SingleChoiceSelect
+            options={currentDialog?.options}
+            onInput={handleDialogInput}
+          />
+        );
     }
   };
 
-  return <Box>{renderCurrentDialog()}</Box>;
+  useEffect(() => {
+    const currentDialog = conversationFlow?.getCurrentDialog();
+    if (!currentDialog) return;
+
+    const newMessages: Message[] = [];
+
+    if (currentDialog.introMessage) {
+      newMessages.push({ text: currentDialog.introMessage, sender: "bot" });
+    }
+
+    if (currentDialog.feedbackMessage) {
+      newMessages.push({ text: currentDialog.feedbackMessage, sender: "bot" });
+      if (
+        !currentDialog.question &&
+        !["goodbye", "callingSamaritans", "calling999"].includes(
+          currentDialog.name,
+        )
+      )
+        conversationFlow?.moveToNext();
+    }
+
+    setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+  }, [conversationFlow, conversationFlow?.getCurrentDialog()]);
+
+  return <Box>{renderCurrentDialogOptions()}</Box>;
 };
 
 export default DialogManager;

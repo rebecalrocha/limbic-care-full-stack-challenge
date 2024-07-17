@@ -47,3 +47,11 @@ export const UPDATE_USER_INFO = gql`
     }
   }
 `;
+
+export const RESTART_QUESTIONNAIRE = gql`
+  mutation RestartQuestionnaire($userId: Int!, $questionnaireId: Int!) {
+    resetQuestionnaire(userId: $userId, questionnaireId: $questionnaireId) {
+      userId
+    }
+  }
+`;

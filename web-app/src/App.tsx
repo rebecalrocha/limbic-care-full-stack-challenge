@@ -19,28 +19,6 @@ const App: React.FC = () => {
     { text: "Hello, what's your name?", sender: "bot" },
   ]);
 
-  useEffect(() => {
-    const currentDialog = conversationFlow?.getCurrentDialog();
-    if (!currentDialog) return;
-
-    const newMessages: Message[] = [];
-
-    if (currentDialog.introMessage) {
-      newMessages.push({ text: currentDialog.introMessage, sender: "bot" });
-    }
-
-    if (currentDialog.name === "start" && currentDialog.question) {
-      newMessages.push({ text: currentDialog.question, sender: "bot" });
-    }
-
-    if (currentDialog.feedbackMessage) {
-      newMessages.push({ text: currentDialog.feedbackMessage, sender: "bot" });
-      conversationFlow?.moveToNext();
-    }
-
-    setMessages((prevMessages) => [...prevMessages, ...newMessages]);
-  }, [conversationFlow, conversationFlow?.getCurrentDialog()]);
-
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Container

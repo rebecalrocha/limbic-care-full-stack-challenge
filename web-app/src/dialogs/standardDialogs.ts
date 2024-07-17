@@ -1,6 +1,6 @@
 import { DialogType } from "../types/dialogTypes";
 
-export const emotionalWellbeingDialogs = (firstName: string): DialogType[] => [
+export const standardDialogs = (firstName: string): DialogType[] => [
   {
     name: "greetings",
     feedbackMessage: `Nice to meet you, ${firstName}!`,
@@ -28,6 +28,12 @@ export const emotionalWellbeingDialogs = (firstName: string): DialogType[] => [
   {
     name: "continuation",
     feedbackMessage: "Alright, so...",
+  },
+  {
+    name: "restart",
+    feedbackMessage: "Alright, so...",
+    question: "What's your name?",
+    type: "text",
   },
   {
     name: "safetyMessage",
@@ -66,7 +72,15 @@ export const emotionalWellbeingDialogs = (firstName: string): DialogType[] => [
     ],
   },
   {
-    name: "bye",
+    name: "goodbye",
     feedbackMessage: `Thanks, ${firstName}, that's all for now!`,
+  },
+  {
+    name: "calling999",
+    feedbackMessage: "Start call to 999.",
+  },
+  {
+    name: "callingSamaritans",
+    feedbackMessage: "Start call to Samaritans.",
   },
 ];

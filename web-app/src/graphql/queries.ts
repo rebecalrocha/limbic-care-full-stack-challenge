@@ -8,6 +8,7 @@ export const GET_QUESTIONNAIRE = gql`
       introMessage
       questions {
         id
+        name
         label
         options {
           label

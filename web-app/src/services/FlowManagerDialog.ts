@@ -32,13 +32,16 @@ export default class FlowManagerDialog {
   public getOptionLabel(input: string | Date): string {
     const currentDialog = this.getCurrentDialog();
 
-    if (currentDialog?.type === "single_choice" && currentDialog.options) {
-      const option = currentDialog.options.find((opt) => opt.value === input);
+    if (currentDialog?.type === "single_choice" && currentDialog?.options) {
+      const inputValue = this.parseInputValue(input);
+      const option = currentDialog?.options.find(
+        (opt) => opt.value === inputValue,
+      );
       if (option) return option.label;
     }
 
-    if (currentDialog?.type === "multi_choice" && currentDialog.options) {
-      const option = currentDialog.options.find((opt) => opt.value === input);
+    if (currentDialog?.type === "multi_choice" && currentDialog?.options) {
+      const option = currentDialog?.options.find((opt) => opt.value === input);
       if (option) return option.label;
     }
 
@@ -48,5 +51,11 @@ export default class FlowManagerDialog {
     }
 
     return input.toString();
+  }
+
+  public parseInputValue(input: InputType): InputType {
+    return typeof input === "string" && !isNaN(parseInt(input, 10))
+      ? parseInt(input, 10)
+      : input;
   }
 }
