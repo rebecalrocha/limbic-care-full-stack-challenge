@@ -1,35 +1,17 @@
-import { dialogs } from "./dialogs";
+import { emotionalWellbeingDialogs } from "../dialogs/EmotionalWellbeingDialog";
+import FlowManagerDialog, { DialogItem, InputType } from "./FlowManagerDialog";
 
-interface DialogItem {
-  name: string;
-  introMessage?: string;
-  question?: string;
-  feedbackMessage?: string;
-  type?: string;
-  options?: { label: string; value: any }[];
-}
+export default class EmotionalWellbeingDialog extends FlowManagerDialog {
+  private userId: string | null;
 
-export default class ConversationFlow {
-  private dialogs: DialogItem[];
-  private currentStep: number;
-
-  constructor(firstName: string) {
-    this.dialogs = dialogs(firstName);
-    this.currentStep = 0;
+  constructor(firstName: string, userId: string | null) {
+    const dialogs = emotionalWellbeingDialogs(firstName);
+    super(dialogs);
+    this.userId = userId;
   }
 
-  public getCurrentDialog(): DialogItem {
-    return this.dialogs[this.currentStep];
-  }
-
-  public moveToNext(): void {
-    this.currentStep++;
-  }
-
-  public processUserInput(
-    input: string | number | Date | string[],
-  ): DialogItem | undefined {
-    const currentDialog = this.dialogs[this.currentStep];
+  public processUserInput(input: InputType): DialogItem | undefined {
+    const currentDialog = this.getCurrentDialog();
 
     if (currentDialog.name === "greetings") {
       if (input === "yes") {

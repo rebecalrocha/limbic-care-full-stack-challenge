@@ -1,4 +1,3 @@
-// graphql/mutations.ts
 import { gql } from "@apollo/client";
 
 export interface StartQuestionnaireResponse {
@@ -16,8 +15,8 @@ export interface SubmitAnswerResponse {
 }
 
 export const START_QUESTIONNAIRE = gql`
-  mutation StartQuestionnaire($name: String!, $questionnaireId: Int!) {
-    startQuestionnaire(name: $name, questionnaireId: $questionnaireId) {
+  mutation StartQuestionnaire($name: String!, $questionnaireName: String!) {
+    startQuestionnaire(name: $name, questionnaireName: $questionnaireName) {
       userId
       questionnaireResponseId
     }
@@ -37,6 +36,14 @@ export const SUBMIT_ANSWER = gql`
     ) {
       questionId
       value
+    }
+  }
+`;
+
+export const UPDATE_USER_INFO = gql`
+  mutation UpdateUserInfo($userId: Int!, $userInfo: User!) {
+    updateUserInfo(userId: $userId, userInfo: $userInfo) {
+      userId
     }
   }
 `;

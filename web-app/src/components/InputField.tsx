@@ -10,7 +10,7 @@ interface Props {
   type?: "text" | "number" | "date";
 }
 
-const Dialog: React.FC<Props> = ({ onInput, type = "text" }) => {
+const InputField: React.FC<Props> = ({ onInput, type = "text" }) => {
   const [input, setInput] = useState<string | Date>("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -37,37 +37,35 @@ const Dialog: React.FC<Props> = ({ onInput, type = "text" }) => {
   };
 
   return (
-    <div>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", alignItems: "center" }}
-      >
-        {type === "date" ? (
-          <DatePicker
-            onChange={(date) => handleDateChange(date)}
-            slotProps={{ textField: { size: "small", fullWidth: true } }}
-            sx={{ marginRight: "8px" }}
-          />
-        ) : (
-          <TextField
-            variant="outlined"
-            value={input}
-            size="small"
-            type={type}
-            color="secondary"
-            onChange={handleInputChange}
-            sx={{ marginRight: "10px" }}
-            placeholder={type === "number" ? "(99) 9999-9999" : ""}
-            autoComplete="off"
-            fullWidth
-          />
-        )}
-        <Button variant="outlined" color="secondary" type="submit" size="large">
-          <SendIcon />
-        </Button>
-      </form>
-    </div>
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: "flex", alignItems: "center" }}
+    >
+      {type === "date" ? (
+        <DatePicker
+          onChange={(date) => handleDateChange(date)}
+          slotProps={{ textField: { size: "small", fullWidth: true } }}
+          sx={{ marginRight: "8px" }}
+        />
+      ) : (
+        <TextField
+          variant="outlined"
+          value={input as string}
+          size="small"
+          type={type}
+          color="secondary"
+          onChange={handleInputChange}
+          sx={{ marginRight: "10px" }}
+          placeholder={type === "number" ? "(99) 9999-9999" : ""}
+          autoComplete="off"
+          fullWidth
+        />
+      )}
+      <Button variant="outlined" color="secondary" type="submit">
+        <SendIcon />
+      </Button>
+    </form>
   );
 };
 
-export default Dialog;
+export default InputField;

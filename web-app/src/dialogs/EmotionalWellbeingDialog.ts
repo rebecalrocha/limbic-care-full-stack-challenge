@@ -1,4 +1,6 @@
-export const dialogs = (firstName: string) => [
+import { DialogType } from "../types/dialogTypes";
+
+export const emotionalWellbeingDialogs = (firstName: string): DialogType[] => [
   {
     name: "greetings",
     feedbackMessage: `Nice to meet you, ${firstName}!`,
@@ -40,7 +42,10 @@ export const dialogs = (firstName: string) => [
   },
   {
     name: "thanks",
-    greetings: `Thanks for answering these questions, ${firstName}!`,
+    feedbackMessage: `Thanks for answering these questions, ${firstName}!`,
+  },
+  {
+    name: "phoneNumber",
     introMessage: "Now I will need to ask you for some personal information.",
     question: "What is your phone number?",
     type: "number",
