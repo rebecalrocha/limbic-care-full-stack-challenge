@@ -3,7 +3,7 @@ import type { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable("questionnaires", function (table) {
     table.increments("id").primary();
-    table.text("name").notNullable();
+    table.text("name").notNullable().unique();
     table.text("introMessage").notNullable();
   });
 }

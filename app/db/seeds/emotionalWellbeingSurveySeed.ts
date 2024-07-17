@@ -10,33 +10,21 @@ export async function seed(knex: Knex): Promise<void> {
 
   const [{ id: questionnaireId }] = await knex(Questionnaire.tableName)
     .insert({
-      name: "EmotionalWellbeingSurvey",
+      name: "EmotionalWellbeingDialog",
       introMessage: "Answer how often this happened in the last two weeks.",
     })
     .returning("id");
 
   const questions = [
-    { label: "Little interest or pleasure in doing things." },
-    { label: "Feeling down, depressed, or hopeless." },
-    { label: "Trouble falling or staying asleep, or sleeping too much." },
-    { label: "Feeling tired, or having little energy." },
-    { label: "Poor appetite or overeating." },
-    {
-      label:
-        "Feeling bad about yourself or that you are a failure or have let yourself or your family down.",
-    },
-    {
-      label:
-        "Trouble concentrating on things, such as reading the newspaper or watching television.",
-    },
-    {
-      label:
-        "Moving or speaking so slowly that other people could have noticed. Or the opposite being so fidgety or restless that you have been moving around a lot more than usual.",
-    },
-    {
-      label:
-        "Thoughts that you would be better off dead, or of hurting yourself.",
-    },
+    { name: "interestOrPleasure", label: "Little interest or pleasure in doing things." },
+    { name: "feelingDown", label: "Feeling down, depressed, or hopeless." },
+    { name: "troubleSleeping", label: "Trouble falling or staying asleep, or sleeping too much." },
+    { name: "feelingTired", label: "Feeling tired, or having little energy." },
+    { name: "appetiteChanges", label: "Poor appetite or overeating." },
+    { name: "selfEsteem", label: "Feeling bad about yourself or that you are a failure or have let yourself or your family down." },
+    { name: "concentrationTrouble", label: "Trouble concentrating on things, such as reading the newspaper or watching television." },
+    { name: "motorChanges", label: "Moving or speaking so slowly that other people could have noticed. Or the opposite being so fidgety or restless that you have been moving around a lot more than usual." },
+    { name: "selfHarmThoughts", label: "Thoughts that you would be better off dead, or of hurting yourself." },
   ];
 
   const frequencyOptions = [
@@ -50,6 +38,7 @@ export async function seed(knex: Knex): Promise<void> {
     const [{ id: questionId }] = await knex(Question.tableName)
       .insert({
         questionnaireId,
+        name: question.name,
         label: question.label,
       })
       .returning("id");
@@ -66,8 +55,8 @@ export async function seed(knex: Knex): Promise<void> {
   const [{ id: questionId }] = await knex(Question.tableName)
     .insert({
       questionnaireId,
-      label:
-        "How difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?",
+      name: "difficultyLevel",
+      label: "How difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?",
     })
     .returning("id");
 

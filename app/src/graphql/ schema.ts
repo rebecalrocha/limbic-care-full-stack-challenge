@@ -9,7 +9,7 @@ export const typeDefs = gql`
   type Mutation {
     startQuestionnaire(
       name: String!
-      questionnaireId: Int!
+      questionnaireName: String!
     ): StartQuestionnaireResponse
     submitAnswer(
       questionnaireResponseId: Int!
@@ -29,6 +29,7 @@ export const typeDefs = gql`
 
   type Question {
     id: Int!
+    name: String!
     label: String!
     options: [Option]
   }

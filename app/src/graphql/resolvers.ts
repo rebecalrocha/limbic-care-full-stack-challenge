@@ -34,14 +34,15 @@ export const resolvers = {
   Mutation: {
     startQuestionnaire: async (
       _: unknown,
-      { name, questionnaireId }: { name: string; questionnaireId: number },
+      { name, questionnaireName }: { name: string; questionnaireName: string },
     ) => {
-      const questionnaire =
-        await Questionnaire.query().findById(questionnaireId);
+      const questionnaire = await Questionnaire.query()
+        .where("name", questionnaireName)
+        .first();
 
       if (!questionnaire) {
         throw new Error(
-          `Questionnaire with ID ${questionnaireId} does not exist.`,
+          `Questionnaire with name ${questionnaireName} does not exist.`,
         );
       }
 

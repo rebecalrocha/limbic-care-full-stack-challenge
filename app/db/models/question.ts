@@ -31,6 +31,7 @@ class Question extends Model {
   id!: number;
   questionnaireId!: number;
   label!: string;
+  name!: string;
   options?: Option[];
 }
 

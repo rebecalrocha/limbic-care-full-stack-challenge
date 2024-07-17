@@ -15,6 +15,22 @@ const InputField: React.FC<Props> = ({ onInput, type = "text" }) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (type === "text" && (input as string).trim().length < 2) {
+      return;
+    }
+
+    if (type === "number" && (input as string).trim().length < 8) {
+      return;
+    }
+
+    if (
+      type === "date" &&
+      !(input instanceof Date && !isNaN(input.getTime()))
+    ) {
+      return;
+    }
+
     onInput(input);
     setInput("");
   };

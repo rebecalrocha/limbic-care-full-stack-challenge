@@ -9,6 +9,7 @@ export async function up(knex: Knex): Promise<void> {
       .references("id")
       .inTable("questionnaires")
       .onDelete("CASCADE");
+    table.text("name").notNullable().unique();
     table.text("label").notNullable();
   });
 }
