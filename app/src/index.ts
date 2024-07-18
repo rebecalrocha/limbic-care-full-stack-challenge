@@ -2,8 +2,10 @@ import { ApolloServer } from "apollo-server";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { typeDefs } from "./graphql/ schema";
 import { resolvers } from "./graphql/resolvers";
+import initDB from "./config/initDB";
 import "./config/dotenv";
-import "./config/knex";
+
+initDB();
 
 const schema = makeExecutableSchema({
   typeDefs,

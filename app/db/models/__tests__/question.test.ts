@@ -1,19 +1,18 @@
 import Question from "../question";
-import knex from "../../../src/config/knex";
 import Questionnaire from "../questionnaire";
+import initDB from "../../../src/config/initDB";
 
-beforeAll(async () => {
-  await knex.migrate.latest();
-});
+beforeAll(() => initDB());
 
 afterAll(async () => {
-  await knex.migrate.rollback();
+  await Question.query().delete();
+  await Questionnaire.query().delete();
 });
 
 describe("Question Model", () => {
   test("Insert Question", async () => {
     const questionnaireData = {
-      name: "Sample Questionnaire",
+      name: "Standard Question Questionnaire",
       introMessage: "Welcome to the questionnaire!",
     };
     const questionnaire = await Questionnaire.query().insert(questionnaireData);

@@ -1,16 +1,10 @@
 import User from "../user";
-import knex from "../../../src/config/knex";
+import initDB from "../../../src/config/initDB";
 
-beforeAll(async () => {
-  await knex.migrate.latest();
-});
-
-afterAll(async () => {
-  await knex.migrate.rollback();
-});
+beforeAll(() => initDB());
 
 describe("User Response", () => {
-  test("TODO: add user response model tests", async () => {
+  test("Insert User", async () => {
     const name = "test-name";
 
     const response = await User.query().insert({ name });

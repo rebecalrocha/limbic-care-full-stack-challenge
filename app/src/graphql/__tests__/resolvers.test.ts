@@ -7,7 +7,7 @@ import Question from "../../../db/models/question";
 
 describe("Resolvers", () => {
   describe("Query", () => {
-    test("getQuestionnaire resolver", async () => {
+    test("Get Questionnaire Resolver", async () => {
       const mockName = "Sample Questionnaire";
 
       const mockQuestionnaire = {
@@ -32,7 +32,7 @@ describe("Resolvers", () => {
       expect(result).toEqual(mockQuestionnaire);
     });
 
-    test("getUserResponses resolver", async () => {
+    test("Get User Responses Resolver", async () => {
       const mockUserId = 1;
       const mockQuestionnaireId = 1;
 
@@ -84,21 +84,79 @@ describe("Resolvers", () => {
       expect(result).toEqual({ userId: 1, questionnaireResponseId: 1 });
     });
 
+    test("Submit Answer Resolver", async () => {
+      const mockUserId = 1;
+      const mockQuestionId = 1;
+      const mockValue = 5;
+      const mockQuestion = { id: mockQuestionId, questionnaireId: 1 };
+      const mockQuestionnaireResponse = {
+        id: 1,
+        userId: mockUserId,
+        questionnaireId: 1,
+        totalValue: 10,
+      };
+      const mockResponse = {
+        id: 1,
+        questionId: mockQuestionId,
+        value: mockValue,
+      };
+
+      const questionQueryMock = jest.fn().mockResolvedValue(mockQuestion);
+      Question.query = jest.fn().mockReturnValue({
+        findById: questionQueryMock,
+      });
+
+      const questionnaireResponseQueryMock = jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        first: jest.fn().mockResolvedValue(mockQuestionnaireResponse),
+        patch: jest.fn().mockReturnThis(),
+        findById: jest.fn().mockResolvedValue({}),
+      });
+      QuestionnaireResponse.query = jest
+        .fn()
+        .mockReturnValue(questionnaireResponseQueryMock());
+
+      const responseQueryMock = jest.fn().mockResolvedValue(mockResponse);
+      Response.query = jest.fn().mockReturnValue({
+        insert: responseQueryMock,
+      });
+
+      const result = await resolvers.Mutation.submitAnswer(null, {
+        userId: mockUserId,
+        questionId: mockQuestionId,
+        value: mockValue,
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(questionQueryMock).toHaveBeenCalledWith(mockQuestionId);
+    });
+
     test.skip("Reset Questionnaire Resolver", async () => {
       const mockUserId = 1;
       const mockQuestionnaireId = 1;
+      const mockQuestionnaireResponse = {
+        id: 1,
+        userId: mockUserId,
+        questionnaireId: mockQuestionnaireId,
+      };
 
       QuestionnaireResponse.query = jest.fn().mockReturnValue({
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        first: jest.fn().mockResolvedValue({ id: 1 }),
+        first: jest.fn().mockResolvedValue(mockQuestionnaireResponse),
       });
 
       Response.query = jest.fn().mockReturnValue({
-        delete: jest.fn().mockResolvedValue({}),
+        delete: jest.fn().mockReturnThis(),
+        where: jest.fn().mockResolvedValue({}),
       });
 
       QuestionnaireResponse.query = jest.fn().mockReturnValue({
+        deleteById: jest.fn().mockResolvedValue({}),
+      });
+
+      User.query = jest.fn().mockReturnValue({
         deleteById: jest.fn().mockResolvedValue({}),
       });
 

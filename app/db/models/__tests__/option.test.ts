@@ -1,20 +1,20 @@
 import Option from "../option";
 import Question from "../question";
-import knex from "../../../src/config/knex";
 import Questionnaire from "../questionnaire";
+import initDB from "../../../src/config/initDB";
 
-beforeAll(async () => {
-  await knex.migrate.latest();
-});
+beforeAll(async () => initDB());
 
 afterAll(async () => {
-  await knex.migrate.rollback();
+  await Option.query().delete();
+  await Question.query().delete();
+  await Questionnaire.query().delete();
 });
 
 describe("Option Model", () => {
   test("Insert Option", async () => {
     const questionnaireData = {
-      name: "Sample Questionnaire",
+      name: "Standard Option Questionnaire",
       introMessage: "Welcome to the questionnaire!",
     };
     const questionnaire = await Questionnaire.query().insert(questionnaireData);
