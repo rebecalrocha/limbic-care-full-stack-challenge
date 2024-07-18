@@ -81,7 +81,6 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
   private async handleStartDialog(input: InputType): Promise<DialogItem> {
     const name = String(input);
     const result = await startQuestionnaire(client, name, QuestionnaireName);
-    console.log("result:  ", result);
     this.userId = result.userId;
     return this.getCurrentDialog();
   }

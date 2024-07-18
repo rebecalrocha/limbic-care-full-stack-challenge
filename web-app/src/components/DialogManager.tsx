@@ -62,7 +62,6 @@ const DialogManager: React.FC<Props> = ({
   ) => {
     const inputValue =
       input instanceof Date ? DateValidator.formatDate(input) : input;
-    console.log("inputValue:  ", inputValue);
     const nextDialog = await dialogFlow.processUserInput(inputValue);
 
     if (nextDialog?.introMessage) {
