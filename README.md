@@ -58,3 +58,5 @@ yarn start
 
 Apollo GraphQL Playground at http://localhost:4000/graphql.
 
+### Project UML Diagram
+At the root of the project, you can find a diagram.drawio file containing the UML diagram of the project. You can view this diagram using the draw.io extension installed in your preferred editor.
