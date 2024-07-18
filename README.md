@@ -1,6 +1,6 @@
 # Limbic Chatbot Project
 
-<img src="https://github.com/user-attachments/assets/58f7fe38-9c48-418c-b978-58e73603f1fd" alt="chatbot" width="500">
+<img src="https://github.com/user-attachments/assets/58f7fe38-9c48-418c-b978-58e73603f1fd" alt="chatbot" width="600">
 
 ## Tech Stack
 - TypeScript
@@ -59,4 +59,11 @@ yarn start
 Apollo GraphQL Playground at http://localhost:4000/graphql.
 
 ### Project UML Diagram
-At the root of the project, you can find a diagram.drawio file containing the UML diagram of the project. You can view this diagram using the draw.io extension installed in your preferred editor.
+
+At the root of the project, you can find a diagram.drawio file containing the UML diagram of the project. 
+
+You can view this diagram using the draw.io extension installed in your preferred editor.
+
+<img src="https://github.com/user-attachments/assets/584877f3-916c-4b52-b759-2a3bc12becf9" alt="diagram" width="600">
+
+
