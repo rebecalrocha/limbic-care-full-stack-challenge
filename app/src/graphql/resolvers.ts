@@ -35,7 +35,7 @@ export const resolvers = {
       const userResponses = await QuestionnaireResponse.query()
         .where("userId", userId)
         .andWhere("questionnaireId", questionnaireId)
-        .withGraphFetched("responses")
+        .withGraphFetched("[questionnaire.[questions.[responses]]]")
         .first();
 
       return userResponses;
@@ -71,43 +71,40 @@ export const resolvers = {
     submitAnswer: async (
       _: unknown,
       {
-        questionnaireResponseId,
+        userId,
         questionId,
         value,
       }: {
-        questionnaireResponseId: number;
+        userId: number;
         questionId: number;
         value: number;
       },
     ) => {
-      const questionnaireResponse =
-        await QuestionnaireResponse.query().findById(questionnaireResponseId);
+      const question = await Question.query().findById(questionId);
+
+      if (!question) {
+        throw new Error(`Question with ID ${questionId} not found.`);
+      }
+
+      const questionnaireResponse = await QuestionnaireResponse.query()
+        .where("userId", userId)
+        .andWhere("questionnaireId", question.questionnaireId)
+        .first();
 
       if (!questionnaireResponse) {
         throw new Error(
-          `Questionnaire Response with ID ${questionnaireResponseId} does not exist.`,
-        );
-      }
-
-      const question = await Question.query().findById(questionId);
-      if (
-        !question ||
-        question.questionnaireId !== questionnaireResponse.questionnaireId
-      ) {
-        throw new Error(
-          `Question with ID ${questionId} does not belong to questionnaire with ID ${questionnaireResponse.questionnaireId}.`,
+          `Question Response with user ID ${userId} and questionnaire ID ${question.questionnaireId} not found.`,
         );
       }
 
       const response = await Response.query().insert({
-        questionnaireResponseId: questionnaireResponse.id,
         questionId,
         value,
       });
 
       await QuestionnaireResponse.query()
         .patch({ totalValue: questionnaireResponse.totalValue + value })
-        .findById(questionnaireResponseId);
+        .findById(questionnaireResponse.id);
 
       return response;
     },

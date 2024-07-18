@@ -26,14 +26,6 @@ class QuestionnaireResponse extends Model {
           to: "questionnaires.id",
         },
       },
-      responses: {
-        relation: Model.HasManyRelation,
-        modelClass: Response,
-        join: {
-          from: "questionnaire_responses.id",
-          to: "responses.questionnaireResponseId",
-        },
-      },
     };
   }
 

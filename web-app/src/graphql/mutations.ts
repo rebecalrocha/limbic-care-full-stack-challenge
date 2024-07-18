@@ -24,16 +24,8 @@ export const START_QUESTIONNAIRE = gql`
 `;
 
 export const SUBMIT_ANSWER = gql`
-  mutation SubmitAnswer(
-    $questionnaireResponseId: Int!
-    $questionId: Int!
-    $value: Int!
-  ) {
-    submitAnswer(
-      questionnaireResponseId: $questionnaireResponseId
-      questionId: $questionId
-      value: $value
-    ) {
+  mutation SubmitAnswer($userId: Int!, $questionId: Int!, $value: Int!) {
+    submitAnswer(userId: $userId, questionId: $questionId, value: $value) {
       questionId
       value
     }

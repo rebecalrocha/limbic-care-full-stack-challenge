@@ -84,43 +84,6 @@ describe("Resolvers", () => {
       expect(result).toEqual({ userId: 1, questionnaireResponseId: 1 });
     });
 
-    test.skip("Submit Answer Resolver", async () => {
-      const mockQuestionnaireResponseId = 1;
-      const mockQuestionId = 1;
-      const mockValue = 5;
-
-      QuestionnaireResponse.query = jest.fn().mockReturnValue({
-        findById: jest.fn().mockResolvedValue({
-          id: mockQuestionnaireResponseId,
-          questionnaireId: 1,
-          totalValue: 0,
-        }),
-      });
-
-      Question.query = jest.fn().mockReturnValue({
-        findById: jest.fn().mockResolvedValue({
-          id: mockQuestionId,
-          questionnaireId: 1,
-        }),
-      });
-
-      Response.query = jest.fn().mockReturnValue({
-        insert: jest.fn().mockResolvedValue({ id: 1 }),
-      });
-
-      QuestionnaireResponse.query = jest.fn().mockReturnValue({
-        patch: jest.fn().mockResolvedValue({}),
-      });
-
-      const result = await resolvers.Mutation.submitAnswer(null, {
-        questionnaireResponseId: mockQuestionnaireResponseId,
-        questionId: mockQuestionId,
-        value: mockValue,
-      });
-
-      expect(result).toBeDefined();
-    });
-
     test.skip("Reset Questionnaire Resolver", async () => {
       const mockUserId = 1;
       const mockQuestionnaireId = 1;

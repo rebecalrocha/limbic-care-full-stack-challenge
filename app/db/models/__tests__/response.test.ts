@@ -1,8 +1,6 @@
 import Response from "../response";
 import knex from "../../../src/config/knex";
-import QuestionnaireResponse from "../questionnaireResponse";
 import Questionnaire from "../questionnaire";
-import User from "../user";
 import Question from "../question";
 
 beforeAll(async () => {
@@ -21,19 +19,6 @@ describe("Response Model", () => {
     };
     const questionnaire = await Questionnaire.query().insert(questionnaireData);
 
-    const name = "test-name";
-    const user = await User.query().insert({ name });
-
-    const questionnaireResponseData = {
-      userId: user.id,
-      questionnaireId: questionnaire.id,
-      totalValue: 10,
-      createdAt: new Date().toISOString(),
-    };
-    const questionnaireResponse = await QuestionnaireResponse.query().insert(
-      questionnaireResponseData,
-    );
-
     const questionData = {
       questionnaireId: questionnaire.id,
       label: "question Label",
@@ -42,7 +27,6 @@ describe("Response Model", () => {
     const question = await Question.query().insert(questionData);
 
     const responseData = {
-      questionnaireResponseId: questionnaireResponse.id,
       questionId: question.id,
       value: 5,
     };
@@ -50,9 +34,6 @@ describe("Response Model", () => {
     const response = await Response.query().insert(responseData);
 
     expect(response).toHaveProperty("id");
-    expect(response.questionnaireResponseId).toBe(
-      responseData.questionnaireResponseId,
-    );
     expect(response.questionId).toBe(responseData.questionId);
     expect(response.value).toBe(responseData.value);
   });

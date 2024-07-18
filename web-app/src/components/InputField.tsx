@@ -72,7 +72,7 @@ const InputField: React.FC<Props> = ({ onInput, type = "text" }) => {
           color="secondary"
           onChange={handleInputChange}
           sx={{ marginRight: "10px" }}
-          placeholder={type === "number" ? "(99) 9999-9999" : ""}
+          placeholder={type === "number" ? "+XX AAAA BBBBBBBB" : ""}
           autoComplete="off"
           fullWidth
         />

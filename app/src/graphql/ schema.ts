@@ -11,27 +11,9 @@ export const typeDefs = gql`
       name: String!
       questionnaireName: String!
     ): StartQuestionnaireResponse
-    submitAnswer(
-      questionnaireResponseId: Int!
-      questionId: Int!
-      value: Int!
-    ): Response
+    submitAnswer(userId: Int!, questionId: Int!, value: Int!): Response
     resetQuestionnaire(userId: Int!, questionnaireId: Int!): UserIdResponse
     updateUserInfo(userId: Int!, userInfo: User!): UserIdResponse
-  }
-
-  type Questionnaire {
-    id: Int!
-    name: String!
-    introMessage: String
-    questions: [Question]
-  }
-
-  type Question {
-    id: Int!
-    name: String!
-    label: String!
-    options: [Option]
   }
 
   type StartQuestionnaireResponse {
@@ -53,9 +35,24 @@ export const typeDefs = gql`
     id: Int!
     userId: Int!
     questionnaireId: Int!
-    responses: [Response]
     totalValue: Int!
     createdAt: String!
+    questionnaire: Questionnaire
+  }
+
+  type Questionnaire {
+    id: Int!
+    name: String!
+    introMessage: String
+    questions: [Question]
+  }
+
+  type Question {
+    id: Int!
+    name: String!
+    label: String!
+    options: [Option]
+    responses: [Response]
   }
 
   type Response {

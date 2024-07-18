@@ -1,5 +1,6 @@
 import { Model } from "objection";
 import Option from "./option";
+import Response from "./response";
 import Questionnaire from "./questionnaire";
 
 class Question extends Model {
@@ -15,6 +16,14 @@ class Question extends Model {
         join: {
           from: "questions.id",
           to: "options.questionId",
+        },
+      },
+      responses: {
+        relation: Model.HasManyRelation,
+        modelClass: Response,
+        join: {
+          from: "questions.id",
+          to: "responses.questionId",
         },
       },
       questionnaire: {
@@ -33,6 +42,7 @@ class Question extends Model {
   label!: string;
   name!: string;
   options?: Option[];
+  responses?: Response[];
 }
 
 export default Question;
