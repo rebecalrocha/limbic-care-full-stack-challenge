@@ -55,14 +55,14 @@ export async function fetchQuestionnaire(
 
 export async function submitAnswer(
   client: ApolloClient<NormalizedCacheObject>,
-  userId: number,
+  questionnaireResponseId: number,
   questionId: number,
   value: number | string,
 ) {
   try {
     const { data } = await client.mutate({
       mutation: SUBMIT_ANSWER,
-      variables: { userId, questionId, value },
+      variables: { questionnaireResponseId, questionId, value },
     });
 
     if (data && data.submitAnswer) {

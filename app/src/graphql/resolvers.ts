@@ -28,18 +28,6 @@ export const resolvers = {
 
       return questionnaire;
     },
-    getUserResponses: async (
-      _: unknown,
-      { userId, questionnaireId }: { userId: number; questionnaireId: number },
-    ) => {
-      const userResponses = await QuestionnaireResponse.query()
-        .where("userId", userId)
-        .andWhere("questionnaireId", questionnaireId)
-        .withGraphFetched("[questionnaire.[questions.[responses]]]")
-        .first();
-
-      return userResponses;
-    },
   },
   Mutation: {
     startQuestionnaire: async (
@@ -71,33 +59,32 @@ export const resolvers = {
     submitAnswer: async (
       _: unknown,
       {
-        userId,
+        questionnaireResponseId,
         questionId,
         value,
       }: {
-        userId: number;
+        questionnaireResponseId: number;
         questionId: number;
         value: number;
       },
     ) => {
+      const questionnaireResponse =
+        await QuestionnaireResponse.query().findById(questionnaireResponseId);
+
+      if (!questionnaireResponse) {
+        throw new Error(
+          `Question Response with ID ${questionnaireResponseId} not found.`,
+        );
+      }
+
       const question = await Question.query().findById(questionId);
 
       if (!question) {
         throw new Error(`Question with ID ${questionId} not found.`);
       }
 
-      const questionnaireResponse = await QuestionnaireResponse.query()
-        .where("userId", userId)
-        .andWhere("questionnaireId", question.questionnaireId)
-        .first();
-
-      if (!questionnaireResponse) {
-        throw new Error(
-          `Question Response with user ID ${userId} and questionnaire ID ${question.questionnaireId} not found.`,
-        );
-      }
-
       const response = await Response.query().insert({
+        questionnaireResponseId,
         questionId,
         value,
       });

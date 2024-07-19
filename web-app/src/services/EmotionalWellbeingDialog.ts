@@ -24,6 +24,7 @@ export interface EmotionalWellbeingDialogItem {
 export default class EmotionalWellbeingDialog extends FlowManagerDialog {
   private userId?: number;
   private questionnaireId?: number;
+  private questionnaireResponseId?: number;
   private firstName: string;
 
   constructor(firstName: string) {
@@ -40,7 +41,7 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
     if (currentDialog.fromApi) {
       await submitAnswer(
         client,
-        this.userId!,
+        this.questionnaireResponseId!,
         currentDialog.id!,
         Number(input),
       );
@@ -82,6 +83,7 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
     const name = String(input);
     const result = await startQuestionnaire(client, name, QuestionnaireName);
     this.userId = result.userId;
+    this.questionnaireResponseId = result.questionnaireResponseId;
     return this.getCurrentDialog();
   }
 
@@ -140,6 +142,7 @@ export default class EmotionalWellbeingDialog extends FlowManagerDialog {
     );
 
     this.userId = result.userId;
+    this.questionnaireResponseId = result.questionnaireResponseId;
     this.firstName = firstName;
     this.dialogs = introductionDialogs(firstName);
 

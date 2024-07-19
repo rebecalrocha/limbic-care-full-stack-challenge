@@ -31,31 +31,6 @@ describe("Resolvers", () => {
 
       expect(result).toEqual(mockQuestionnaire);
     });
-
-    test("Get User Responses Resolver", async () => {
-      const mockUserId = 1;
-      const mockQuestionnaireId = 1;
-
-      const mockUserResponses = {
-        userId: mockUserId,
-        questionnaireId: mockQuestionnaireId,
-        responses: [{ id: 1, questionId: 1, value: 5 }],
-      };
-
-      QuestionnaireResponse.query = jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        withGraphFetched: jest.fn().mockReturnThis(),
-        first: jest.fn().mockResolvedValue(mockUserResponses),
-      });
-
-      const result = await resolvers.Query.getUserResponses(null, {
-        userId: mockUserId,
-        questionnaireId: mockQuestionnaireId,
-      });
-
-      expect(result).toEqual(mockUserResponses);
-    });
   });
 
   describe("Mutation", () => {
@@ -123,7 +98,7 @@ describe("Resolvers", () => {
       });
 
       const result = await resolvers.Mutation.submitAnswer(null, {
-        userId: mockUserId,
+        questionnaireResponseId: mockQuestionnaireResponse.id,
         questionId: mockQuestionId,
         value: mockValue,
       });

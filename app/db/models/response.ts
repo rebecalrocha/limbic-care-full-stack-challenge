@@ -9,6 +9,14 @@ class Response extends Model {
 
   static get relationMappings() {
     return {
+      questionResponse: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: QuestionnaireResponse,
+        join: {
+          from: "responses.questionnaireResponseId",
+          to: "questionnaireResponses.id",
+        },
+      },
       question: {
         relation: Model.BelongsToOneRelation,
         modelClass: Question,
@@ -21,6 +29,7 @@ class Response extends Model {
   }
 
   id!: number;
+  questionnaireResponseId!: number;
   questionId!: number;
   value!: number;
 }

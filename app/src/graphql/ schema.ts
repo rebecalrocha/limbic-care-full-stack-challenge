@@ -3,7 +3,6 @@ import { gql } from "apollo-server";
 export const typeDefs = gql`
   type Query {
     getQuestionnaire(name: String!): Questionnaire
-    getUserResponses(userId: Int!, questionnaireId: Int!): QuestionnaireResponse
   }
 
   type Mutation {
@@ -11,7 +10,11 @@ export const typeDefs = gql`
       name: String!
       questionnaireName: String!
     ): StartQuestionnaireResponse
-    submitAnswer(userId: Int!, questionId: Int!, value: Int!): Response
+    submitAnswer(
+      questionnaireResponseId: Int!
+      questionId: Int!
+      value: Int!
+    ): Response
     resetQuestionnaire(userId: Int!, questionnaireId: Int!): UserIdResponse
     updateUserInfo(userId: Int!, userInfo: User!): UserIdResponse
   }
@@ -23,21 +26,6 @@ export const typeDefs = gql`
 
   type UserIdResponse {
     userId: Int!
-  }
-
-  type Option {
-    id: Int!
-    label: String!
-    value: Int
-  }
-
-  type QuestionnaireResponse {
-    id: Int!
-    userId: Int!
-    questionnaireId: Int!
-    totalValue: Int!
-    createdAt: String!
-    questionnaire: Questionnaire
   }
 
   type Questionnaire {
@@ -53,6 +41,12 @@ export const typeDefs = gql`
     label: String!
     options: [Option]
     responses: [Response]
+  }
+
+  type Option {
+    id: Int!
+    label: String!
+    value: Int
   }
 
   type Response {
