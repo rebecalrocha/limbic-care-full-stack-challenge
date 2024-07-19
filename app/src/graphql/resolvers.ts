@@ -1,8 +1,8 @@
-import User from "../../db/models/user";
-import Questionnaire from "../../db/models/questionnaire";
-import Question from "../../db/models/question";
-import QuestionnaireResponse from "../../db/models/questionnaireResponse";
-import Response from "../../db/models/response";
+import User from "@limbic-chatbot/db/models/user";
+import Questionnaire from "@limbic-chatbot/db/models/questionnaire";
+import Question from "@limbic-chatbot/db/models/question";
+import QuestionnaireResponse from "@limbic-chatbot/db/models/questionnaireResponse";
+import Response from "@limbic-chatbot/db/models/response";
 
 export interface UserInfo {
   name: string;

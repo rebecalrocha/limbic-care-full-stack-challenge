@@ -1,9 +1,9 @@
 import { resolvers, UserInfo } from "../resolvers";
-import Questionnaire from "../../../db/models/questionnaire";
-import QuestionnaireResponse from "../../../db/models/questionnaireResponse";
-import Response from "../../../db/models/response";
-import User from "../../../db/models/user";
-import Question from "../../../db/models/question";
+import Questionnaire from "@limbic-chatbot/db/models/questionnaire";
+import QuestionnaireResponse from "@limbic-chatbot/db/models/questionnaireResponse";
+import Response from "@limbic-chatbot/db/models/response";
+import User from "@limbic-chatbot/db/models/user";
+import Question from "@limbic-chatbot/db/models/question";
 
 describe("Resolvers", () => {
   describe("Query", () => {

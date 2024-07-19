@@ -1,5 +1,5 @@
 import Questionnaire from "../questionnaire";
-import initDB from "../../../src/config/initDB";
+import initDB from "@limbic-chatbot/src/config/initDB";
 
 beforeAll(() => initDB());
 
